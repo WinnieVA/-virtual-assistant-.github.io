@@ -1,40 +1,35 @@
-<div class="container">
-    <div id="main">
-        <div class="section" id="about">
-            <h2>About Me</h2>
-            <p>Hello! I'm Winnie, a professional virtual assistant dedicated to providing top-notch administrative support and helping businesses and individuals stay organized and productive. With a background in various administrative roles, I bring a wealth of experience and a detail-oriented approach to every task.</p>
-        </div>
+import requests
+from bs4 import BeautifulSoup
 
-        <div class="section" id="services">
-            <h2>Services</h2>
-            <ul>
-                <li>Email management</li>
-                <li>Scheduling and calendar management</li>
-                <li>Data entry</li>
-                <li>Research</li>
-                <li>Customer service</li>
-                <li>Bookkeeping</li>
-                <li>Quickbook management</li>
-                <!-- Add more services as per your portfolio -->
-            </ul>
-        </div>
+def fetch_profile(url):
+    response = requests.get(url)
+    return response.text
 
-        <div class="section" id="rates">
-            <h2>Rates</h2>
-            <p>My hourly rate is $20 per hour. First-time clients get a $3 discount, making your initial sessions $17 per hour. Let's talk about your needs and how I can help you better.</p>
-        </div>
+def parse_profile(profile_html):
+    soup = BeautifulSoup(profile_html, 'html.parser')
+    profile_data = {
+        'headline': soup.find('h1', {'class': 'profile-title'}).text.strip(),
+        'skills': [skill.text for skill in soup.find_all('span', {'class': 'skill-name'})],
+        'feedback': soup.find('div', {'class': 'feedback-score'}).text.strip(),
+        'job_success': soup.find('div', {'class': 'job-success-score'}).text.strip(),
+    }
+    return profile_data
 
-        <div class="section" id="contact">
-            <h2>Contact</h2>
-            <p>I'm available to assist you. Feel free to reach out to me to discuss your requirements and schedule a consultation.</p>
-            <p>Email: <a href="mailto:winnietheva@gmail.com">winnietheva@gmail.com</a></p>
-            <p>(Whatsapp)Phone: (254) 704552432</p>
-            <!-- Replace with actual contact details -->
-        </div>
-    </div>
-</div>
+def compare_profiles(profile1, profile2):
+    differences = {}
+    for key in profile1:
+        if profile1[key] != profile2[key]:
+            differences[key] = {'profile1': profile1[key], 'profile2': profile2[key]}
+    return differences
 
+profile1_url = '[https://www.upwork.com/freelancers/PROFILE1_ID](https://www.upwork.com/nx/search/talent/?nav_dir=pop&nbs=1&q=virtual%20assistant%20entry%20level)'
+profile2_url = '[https://www.upwork.com/freelancers/PROFILE2_I](https://www.upwork.com/nx/find-work/)'
 
-<footer>
-    <p>&copy; 2024 Winnie the Virtual Assistant. All rights reserved.</p>
-</footer>
+profile1_html = fetch_profile(profile1_url)
+profile2_html = fetch_profile(profile2_url)
+
+profile1_data = parse_profile(profile1_html)
+profile2_data = parse_profile(profile2_html)
+
+differences = compare_profiles(profile1_data, profile2_data)
+print(differences)
